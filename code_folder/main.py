@@ -30,9 +30,9 @@ def aggregate_df_to_sum_per_location_gdf(df):
     print("Turning DataFrame into GeoDataFrame")
 
     data = df.groupby("standort").agg({
-        "zählstand": "sum",
-        "latitude": "mean",
-        "longitude": "mean"
+        "zählstand": "mean",
+        "latitude": "sum",
+        "longitude": "sum"
     })
 
     gdf = gpd.GeoDataFrame(
@@ -54,7 +54,7 @@ def plot_sum_per_location(gdf, df):
     ax = gdf_web_mercator.plot(
         "zählstand",
         legend=True,
-        cmap="Blues",
+        cmap="Set2",
         edgecolor="Black"
     )
     cx.add_basemap(ax)
@@ -77,7 +77,7 @@ def calculate_the_average_busiest_hour_for_each_counter(df):
          "zählstand": "mean"
     })
 
-    # to show the whole row we need the index where the max zählstand per counter site is
+    # to show the whole row we need the index with the max zählstand per counter site
     idx = counter_site_df.groupby(["counter_site"])['zählstand'].transform("max") == counter_site_df['zählstand']
     max_counter_count_df = counter_site_df[idx]
 
@@ -87,7 +87,9 @@ def calculate_the_average_busiest_hour_for_each_counter(df):
     # build a nice time based format to write the result as csv
     min_date, max_date = get_min_and_max_timestamp(df)
 
-    max_counter_count_df.to_csv(f"../result_data/{min_date}_{max_date}_max_average_traffic_per_counter_site.csv")
+    max_counter_count_df.to_csv(
+        f"../result_data/{min_date}_{max_date}_max_average_traffic_per_counter_site.csv"
+    )
 
 
 def plot_average_activity_over_a_day(df):
@@ -95,7 +97,7 @@ def plot_average_activity_over_a_day(df):
     print("Plotting a bar chart of the average bike activity in a day")
 
     grouped_by_hour_df = df.groupby("hour").agg({"zählstand": "mean"})
-    grouped_by_hour_df.plot(title="Average Activity over a Day")
+    grouped_by_hour_df.plot(title="Hier könnte ihr Titel stehen")
     min_date, max_date = get_min_and_max_timestamp(df)
     plt.savefig(f"../result_figures/{min_date}_{max_date}_average_activity_over_a_day.jpeg")
     grouped_by_hour_df.to_csv(f"../result_data/{min_date}_{max_date}_average_activity_over_a_day.csv")
