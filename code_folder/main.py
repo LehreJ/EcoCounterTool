@@ -30,9 +30,9 @@ def aggregate_df_to_sum_per_location_gdf(df):
     print("Turning DataFrame into GeoDataFrame")
 
     data = df.groupby("standort").agg({
-        "zählstand": "mean",
-        "latitude": "sum",
-        "longitude": "sum"
+        "zählstand": "sum",
+        "latitude": "mean",
+        "longitude": "mean"
     })
 
     gdf = gpd.GeoDataFrame(
