@@ -5,22 +5,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import contextily as cx
 
-from utils import get_min_and_max_timestamp
-
 
 def load_file_to_df(path):
     print("Loading file into DataFrame")
 
     df = pd.read_csv(path)
 
-    # make iso_timestamp a proper datetime datatype, not just a string
-    df['iso_timestamp'] = pd.to_datetime(
-        df['iso_timestamp'],
-        format='ISO8601'
-    )
     # add hour column which only contains the hour as integer
     df['hour'] = df.iso_timestamp.apply(
-        lambda timestamp: timestamp.hour
+        lambda timestamp: int(timestamp[11:13])
     )
     return df
 
@@ -59,8 +52,7 @@ def plot_sum_per_location(gdf, df):
     )
     cx.add_basemap(ax)
 
-    min_date, max_date = get_min_and_max_timestamp(df)
-    plt.savefig(f"../result_figures/{min_date}_{max_date}_total_count_per_city_map.png")
+    plt.savefig(f"../result_figures/total_count_per_city_map.png")
 
 
 def filter_heidelberg(df):
@@ -85,10 +77,9 @@ def calculate_the_average_busiest_hour_for_each_counter(df):
     max_counter_count_df = max_counter_count_df[max_counter_count_df.zählstand != 0]
 
     # build a nice time based format to write the result as csv
-    min_date, max_date = get_min_and_max_timestamp(df)
 
     max_counter_count_df.to_csv(
-        f"../result_data/{min_date}_{max_date}_max_average_traffic_per_counter_site.csv"
+        f"../result_data/max_average_traffic_per_counter_site.csv"
     )
 
 
@@ -98,9 +89,8 @@ def plot_average_activity_over_a_day(df):
 
     grouped_by_hour_df = df.groupby("hour").agg({"zählstand": "mean"})
     grouped_by_hour_df.plot(title="Hier könnte ihr Titel stehen")
-    min_date, max_date = get_min_and_max_timestamp(df)
-    plt.savefig(f"../result_figures/{min_date}_{max_date}_average_activity_over_a_day.jpeg")
-    grouped_by_hour_df.to_csv(f"../result_data/{min_date}_{max_date}_average_activity_over_a_day.csv")
+    plt.savefig(f"../result_figures/average_activity_over_a_day.jpeg")
+    grouped_by_hour_df.to_csv(f"../result_data/average_activity_over_a_day.csv")
 
 
 def main():
